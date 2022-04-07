@@ -2,6 +2,26 @@ const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator')
 require('dotenv').config();
 
+const mongoose = require("mongoose");
+
+//
+mongoose
+    .connect(process.env.MONGO_URL, {useNewUrlParser: true, useUnifiedTopology: true})
+    .then((res) => console.log('Connected to DB'))
+    .catch((error) => console.log(error));
+
+
+const Schema = mongoose.Schema;
+
+
+// установка схемы
+const userScheme = new Schema({
+    login: String,
+    password: String
+});
+
+const User = mongoose.model("users1", userScheme);
+
 
 class authController {
     async signin(req, res){
@@ -57,5 +77,14 @@ class authController {
         return res.status(404).json({ message: 'User not found' })
     }
 }
+
+function isEmpty(obj) {
+    for (let key in obj) {
+      // если тело цикла начнет выполняться - значит в объекте есть свойства
+      return false;
+    }
+    return true;
+  }
+
 
 module.exports = new authController()
