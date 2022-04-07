@@ -7,8 +7,10 @@ module.exports = function (req, res, next) {
   
     //check('login').isLength({ min: 3 });
 
-    if (req.body.login == 'user1'){
-        console.log(123);
+    if ((req.body.login).length > 3){
+        console.log('Length > 3');
+    } else {
+        console.log('Length < 4');
     }
 
     body('login').isLength({ min: 3 });
