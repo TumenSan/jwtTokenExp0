@@ -43,6 +43,7 @@ router.use((req, res, next) => {
 })
 */
 
+/*
 var jwtFunction = function(req, res, next){
   if (req.headers.authorization) {
     jwt.verify(
@@ -66,6 +67,7 @@ var jwtFunction = function(req, res, next){
 
   next();
 }
+*/
 
 router.post('/api/next', (req, res) => {
   for (let user of users) {
@@ -117,10 +119,45 @@ router.post('/api/auth', cb0Middleware, function(req, res){
       return res.status(200).json({
         id: user.id,
         login: user.login,
+        token: jwt.sign({ id: user.id }, tokenKey, { expiresIn: '120s' }),
+      })
+    }
+  }
+
+  return res.status(404).json({ message: 'User not found' })
+})
+
+router.get('/api/get', function(req, res){
+  for (let user of users) {
+    if (
+      req.body.login === user.login &&
+      req.body.password === user.password
+    ) {
+      return res.status(200).json({
+        id: user.id,
+        login: user.login,
         token: jwt.sign({ id: user.id }, tokenKey),
       })
     }
   }
+
+  //const authHeader = req.headers['authorization']
+  //const token = authHeader && authHeader.split(' ')[1]
+
+  const token = req.headers.authorization.split(' ')[1]
+            if (!token) {
+                return res.status(403).json({message: "Пользователь не авторизован"})
+            }
+            //jwt.verify(token, secret)
+
+            jwt.verify(token, '1a2b-3c4d-5e6f-7g8h', (err, payload) => {
+              console.log(err)
+          
+              if (err) return res.sendStatus(403)
+          
+              console.log('get work')
+              return res.status(404).json({ message: 'User found' })
+            })
 
   return res.status(404).json({ message: 'User not found' })
 })
