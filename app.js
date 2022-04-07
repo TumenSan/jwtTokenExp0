@@ -30,6 +30,7 @@ const User = mongoose.model("users1", userScheme);
   const appMiddleware = require('./Middleware/appMiddleware')
   const signinMiddleware = require('./Middleware/signinMiddleware')
   const signupMiddleware = require('./Middleware/signupMiddleware')
+  const controller = require('./authController')
 
 const host = '127.0.0.1'
 const port = 7000
@@ -41,74 +42,7 @@ const tokenKey = '1a2b-3c4d-5e6f-7g8h'
 router.use(express.static(__dirname + "/public")); //
 
 router.use(express.json())
-/*
-router.use((req, res, next) => {
-  if (req.headers.authorization) {
-    jwt.verify(
-      req.headers.authorization.split(' ')[1],
-      tokenKey,
-      (err, payload) => {
-        if (err) next()
-        else if (payload) {
-          for (let user of users) {
-            if (user.id === payload.id) {
-              req.user = user
-              next()
-            }
-          }
 
-          if (!req.user) next()
-        }
-      }
-    )
-  }
-
-  next()
-})
-*/
-
-/*
-var jwtFunction = function(req, res, next){
-  if (req.headers.authorization) {
-    jwt.verify(
-      req.headers.authorization.split(' ')[1],
-      tokenKey,
-      (err, payload) => {
-        if (err) next()
-        else if (payload) {
-          for (let user of users) {
-            if (user.id === payload.id) {
-              req.user = user
-              next()
-            }
-          }
-
-          if (!req.user) next()
-        }
-      }
-    )
-  }
-
-  next();
-}
-*/
-
-router.post('/api/next', (req, res) => {
-  for (let user of users) {
-    if (
-      req.body.login === user.login &&
-      req.body.password === user.password
-    ) {
-      return res.status(200).json({
-        id: user.id,
-        login: user.login,
-        token: jwt.sign({ id: user.id }, tokenKey),
-      })
-    }
-  }
-
-  return res.status(404).json({ message: 'User not found' })
-})
 
 
 var cb0 = function (req, res, next) {
@@ -134,38 +68,7 @@ var cb0 = function (req, res, next) {
   next();
 }
 
-router.post('/signin', signinMiddleware, async function(req, res){
-  try{
-    console.log('work');
-    const userLogin = req.body.login;
-    const userPassword = req.body.password;
-    let user = null;
-    user = await User.find({$and : [{login: userLogin}, {password: userPassword}]});
-    if(isEmpty(user)){
-      console.log('ErrorUser1');
-        throw new Error(404);
-        //return res.status(404);
-    } else {
-      try{
-            return res.status(200).json({
-              login: req.body.login,
-              password: req.body.password,
-              token: jwt.sign({ login: user.login, password: user.password}, tokenKey, { expiresIn: '120s' })
-            })
-      }
-      catch(err) {
-         //res.status(404).send();
-         console.log('ErrorUser2', err);
-         throw new Error(404);
-      } 
-    }
-
-  }
-  catch(error) {
-      console.log('no work', error);
-      res.status(404).send();
-  }
-})
+router.post('/signin', signinMiddleware, controller.signin)
 
 router.post('/signup', signupMiddleware, async function(req, res){
   try{
@@ -204,85 +107,36 @@ router.post('/signup', signupMiddleware, async function(req, res){
   }
 })
 
-router.get('/me',  function(req, res){
+router.get('/me',  controller.me)
 
-  const token = req.headers.authorization.split(' ')[1]
-  if (!token) {
-    return res.status(403).json({message: "Пользователь не авторизован"})
-  }
-  //jwt.verify(token, secret)
-
-  jwt.verify(token, '1a2b-3c4d-5e6f-7g8h', (err, payload) => {
-    console.log(err)
-
-    if (err) return res.sendStatus(403)
-
-    console.log('get work')
-    return res.status(404).json({ message: 'User found' })
-  })
-
-  return res.status(404).json({ message: 'User not found' })
-})
-
-router.post('/api/auth', signinMiddleware, function(req, res){
-  for (let user of users) {
-    if (
-      req.body.login === user.login &&
-      req.body.password === user.password
-    ) {
-      const userBase = new User({
-        login: req.body.login,
-        password: req.body.password,
-        token: ""
-    });
+router.get('/users',  function(req, res){
+  let user = null;
     
-    userBase.save();
-    
-      return res.status(200).json({
-        id: user.id,
-        login: user.login,
-        token: jwt.sign({ id: user.id }, tokenKey, { expiresIn: '120s' }),
-      })
-    }
-  }
+    User.find({}, function(err, doc){
+        //mongoose.disconnect();
+         
+        if(err) return console.log(err);
+         
+        user = doc;
+        //console.log(user);
+        console.log(doc.login);
 
-  return res.status(404).json({ message: 'User not found' })
-})
-
-router.get('/api/get', function(req, res){
-  for (let user of users) {
-    if (
-      req.body.login === user.login &&
-      req.body.password === user.password
-    ) {
-      return res.status(200).json({
-        id: user.id,
-        login: user.login,
-        token: jwt.sign({ id: user.id }, tokenKey),
-      })
-    }
-  }
-
-  //const authHeader = req.headers['authorization']
-  //const token = authHeader && authHeader.split(' ')[1]
-
-  const token = req.headers.authorization.split(' ')[1]
-            if (!token) {
-                return res.status(403).json({message: "Пользователь не авторизован"})
-            }
-            //jwt.verify(token, secret)
-
-            jwt.verify(token, '1a2b-3c4d-5e6f-7g8h', (err, payload) => {
-              console.log(err)
-          
-              if (err) return res.sendStatus(403)
-          
-              console.log('get work')
-              return res.status(404).json({ message: 'User found' })
+        // отправляем пользователя
+        if(user){
+            //res.send(user);
+            return res.status(200).json({
+              //login: req.body.login,
+              //password: req.body.password
+              user
             })
-
-  return res.status(404).json({ message: 'User not found' })
+        }
+        else{
+            return res.status(404)
+            //res.status(404).send();
+        }
+    });
 })
+
 
 /*
 router.post('/api/next', [
