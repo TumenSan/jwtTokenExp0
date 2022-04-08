@@ -1,7 +1,6 @@
 const express = require('express'),
   app = express(),
-  jwt = require('jsonwebtoken'),
-  users = require('./users')
+  jwt = require('jsonwebtoken')
 
 const fs = require("fs");
 require('dotenv').config();
@@ -23,14 +22,16 @@ const userScheme = new Schema({
     password: String
 });
 
+//const User = require('./models/User')
+//const Role = require('./models/Role')
+
 const User = mongoose.model("users1", userScheme);
 //
 
   const router = new express()
-  const appMiddleware = require('./Middleware/appMiddleware')
   const signinMiddleware = require('./Middleware/signinMiddleware')
   const signupMiddleware = require('./Middleware/signupMiddleware')
-  
+  const controller = require('./authController')
 
 const host = '127.0.0.1'
 const port = 7000
@@ -84,7 +85,7 @@ router.post('/signin', signinMiddleware, async function(req, res){
             return res.status(200).json({
               login: req.body.login,
               password: req.body.password,
-              token: jwt.sign({ login: user.login, password: user.password}, tokenKey, { expiresIn: '120s' })
+              token: jwt.sign({ login: user.login, password: user.password}, tokenKey, { expiresIn: '1h' })
             })
       }
       catch(err) {
@@ -139,23 +140,22 @@ router.post('/signup', signupMiddleware, async function(req, res){
 })
 
 router.get('/me',  function(req, res){
-
   const token = req.headers.authorization.split(' ')[1]
-  if (!token) {
-    return res.status(403).json({message: "Пользователь не авторизован"})
-  }
-  //jwt.verify(token, secret)
+        if (!token) {
+          return res.status(403).json({message: "Пользователь не авторизован"})
+        }
+        //jwt.verify(token, secret)
+        try{
+          const decodedData = jwt.verify(token, '1a2b-3c4d-5e6f-7g8h');
 
-  jwt.verify(token, '1a2b-3c4d-5e6f-7g8h', (err, payload) => {
-    console.log(err)
-
-    if (err) return res.sendStatus(403)
-
-    console.log('get work')
-    return res.status(404).json({ message: 'User found' })
-  })
-
-  return res.status(404).json({ message: 'User not found' })
+        console.log('get work')
+          return res.status(200).json({
+            decodedData
+          })
+        }
+        catch{
+          return res.status(404).json({ message: 'User not found' })
+        }
 })
 
 router.get('/users',  function(req, res){
@@ -187,39 +187,23 @@ router.get('/users',  function(req, res){
 })
 
 
-/*
-router.post('/api/next', [
-  jwtFunction,
-  check('login').isLength({ min: 3 }),
-  check('password').isLength({ min: 3 })
-], function(req, res){
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    return res.status(422).json({ errors: errors.array() })
-  }
-  for (let user of users) {
-    if (
-      req.body.login === user.login &&
-      req.body.password === user.password
-    ) {
-      return res.status(200).json({
-        id: user.id,
-        login: user.login,
-        token: jwt.sign({ id: user.id }, tokenKey),
-      })
-    }
-  }
-
-  return res.status(404).json({ message: 'User not found' })
-})
-*/
-
 router.get('/user', (req, res) => {
-  if (req.user) return res.status(200).json(req.user)
-  else
-    return res
-      .status(401)
-      .json({ message: 'Not authorized' })
+  const token = req.headers.authorization.split(' ')[1]
+        if (!token) {
+          return res.status(403).json({message: "Пользователь не авторизован"})
+        }
+        //jwt.verify(token, secret)
+        try{
+          const decodedData = jwt.verify(token, '1a2b-3c4d-5e6f-7g8h');
+
+        console.log('get work')
+          return res.status(200).json({
+            decodedData
+          })
+        }
+        catch{
+          return res.status(404).json({ message: 'User not found' })
+        }
 })
 
 

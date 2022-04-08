@@ -2,17 +2,17 @@
 document.forms["userForm"].addEventListener("submit", e => {
     e.preventDefault();
     const form = document.forms["userForm"];
-    const name = form.elements["name"].value;
+    const login = form.elements["login"].value;
     const password = form.elements["password"].value;
-    console.log(name);
+    console.log(login);
     console.log(password);
-    signupJwt(name, password);
+    signupJwt(login, password);
     //reset();
 });
 
 async function signupJwt(userLogin, userPassword) {
     // отправляет запрос и получаем ответ
-    const response = await fetch("/api/auth", {
+    const response = await fetch("/signup", {
         method: "POST",
         headers: { "Accept": "application/json", "Content-Type": "application/json"},
         body: JSON.stringify({
@@ -24,13 +24,6 @@ async function signupJwt(userLogin, userPassword) {
     if (response.ok === true) {
         // получаем данные
         const users = await response.json();
-
-        console.log(users.token);
-
-        localStorage.setItem('bearerToken', users.token);
-        //alert( localStorage.getItem('bearerToken') );
-        console.log(localStorage.getItem('bearerToken')); //
-
 
         console.log(users);
 
@@ -47,128 +40,51 @@ async function signupJwt(userLogin, userPassword) {
 function signinPre() {
     
     const form = document.forms["userForm"];
-    const name = form.elements["name"].value;
+    const login = form.elements["login"].value;
     const password = form.elements["password"].value;
-    console.log(name);
+    console.log(login);
     console.log(password);
-    signin(name, password);
+    signin(login, password);
 }
 
-async function signin(userName, userPassword) {
+async function signin(userLogin, userPassword) {
     // отправляет запрос и получаем ответ
-    const response = await fetch("/api/next", {
+    const response = await fetch("/signin", {
         method: "POST",
         headers: { "Accept": "application/json", "Content-Type": "application/json"},
         body: JSON.stringify({
-            login: userName,
+            login: userLogin,
             password: userPassword
         })
     });
-    // если запрос прошел нормально
-    /*
-    if (response.ok === true) {
-        
-        // получаем данные
-        const user = await response.json();
-        //let rows = document.querySelector("tbody");
-        let TokenLabel = document.createElement('div');
-        console.log(user.token);
-        //document.cookie = "name=bearerToken; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
-        //delete document.cookie['bearerToken'];
-        //document.cookie = user.token;
-        //alert(document.cookie);
 
-        localStorage.setItem('bearerToken', user.token);
-        //alert( localStorage.getItem('bearerToken') );
-
-        console.log(user);
-        */
        // если запрос прошел нормально
     if (response.ok === true) {
         // получаем данные
         const users = await response.json();
-
+        // set token in cookie
+        document.cookie = `token=${users.token}`;
         console.log(users);
 
         console.log('ok signup');
     }
     // если запрос прошел неправильно
     else {
-
         console.log('Error signup');
     }
 }
 
-
-async function signup(userName, userPassword) {
-    // отправляет запрос и получаем ответ
-    const response = await fetch("/signup", {
-        method: "POST",
-        headers: { "Accept": "application/json", "Content-Type": "application/json"},
-        body: JSON.stringify({
-            name: userName,
-            password: userPassword
-        })
-    });
-    // если запрос прошел нормально
-    if (response.ok === true) {
-        // получаем данные
-        const users = await response.json();
-
-
-        console.log(users.token);
-
-        localStorage.setItem('bearerToken', users.token);
-        //alert( localStorage.getItem('bearerToken') );
-        localStorage.getItem('bearerToken'); //
-
-        console.log(users.token);
-
-        console.log(users);
-    }
-    // если запрос прошел неправильно
-    else {
-
-        console.log('Error signup');
-    }
-}
-//!!!!!
-function Get1UserPre() {
-    const form = document.forms["userForm"];
-    const name = form.elements["name"].value;
-    const password = form.elements["password"].value;
-    console.log(name);
-    console.log(password);
-    Get1User(name, password);
-}
-// Получение пользователя
-async function Get1User(userName, userPassword) {
-    const response = await fetch("/useri", {
-        method: "POST",
-        headers: { "Accept": "application/json", "Content-Type": "application/json"},
-        body: JSON.stringify({
-            name: userName,
-            password: userPassword
-        })
-    });
-    // если запрос прошел нормально
-    if (response.ok === true) {
-        // получаем данные
-        const users = await response.json();
-
-        console.log(users);
-    }
-}
-//
 
 async function MeUsers() {
     // отправляет запрос и получаем ответ
-    const response = await fetch("/me/" + localStorage.getItem('bearerToken'), {
+    const response = await fetch("/me/", {
         method: "GET",
-        headers: { "Accept": "application/json" }
+        headers: { "Accept": "application/json", 
+                    "Authorization": "Bearer" + document.cookie}
     });
     // если запрос прошел нормально
     if (response.ok === true) {
+        console.log('me user ok');
         // получаем данные
         const user = await response.json();
         //let rows = document.querySelector("tbody"); 
@@ -179,6 +95,10 @@ async function MeUsers() {
         document.body.append(loginLabel);
 
         console.log(user);
+    }
+    else {
+
+        console.log('Error me');
     }
 }
 
@@ -195,6 +115,10 @@ async function GetUsers() {
         const users = await response.json();
 
         console.log(users);
+    }
+    else {
+
+        console.log('Error users');
     }
 }
 
@@ -246,6 +170,6 @@ document.forms["userForm"].addEventListener("submit", e => {
 
 function reset(){
     const form = document.forms["userForm"];
-    form.elements["name"].value = '';
+    form.elements["login"].value = '';
     form.elements["password"].value = '';
 }

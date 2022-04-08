@@ -11,7 +11,15 @@ module.exports = function (req, res, next) {
         console.log('Length > 0');
     } else {
         console.log('Length < 1');
+        return res.status(403).json({message: "логин должен быть заполнен"})
     }
+
+    if ((req.body.password).length > 0){
+      console.log('Length > 0');
+  } else {
+      console.log('Length < 1');
+      return res.status(403).json({message: "пароль должен быть заполнен"})
+  }
 
     body('login').isLength({ min: 3 });
     // Extract the validation errors from a request.

@@ -11,7 +11,15 @@ module.exports = function (req, res, next) {
         console.log('Length > 3');
     } else {
         console.log('Length < 4');
+        return res.status(403).json({message: "логин меньше 4 символов"})
     }
+
+    if ((req.body.password).length > 3){
+      console.log('Length > 3');
+  } else {
+      console.log('Length < 4');
+      return res.status(403).json({message: "пароль меньше 4 символов"})
+  }
 
     body('login').isLength({ min: 3 });
     // Extract the validation errors from a request.

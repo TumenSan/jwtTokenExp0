@@ -2,35 +2,31 @@ const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator')
 require('dotenv').config();
 
+/*
 const mongoose = require("mongoose");
-
-//
 mongoose
     .connect(process.env.MONGO_URL, {useNewUrlParser: true, useUnifiedTopology: true})
     .then((res) => console.log('Connected to DB'))
     .catch((error) => console.log(error));
-
-
 const Schema = mongoose.Schema;
-
-
 // установка схемы
 const userScheme = new Schema({
-    login: String,
-    password: String
+  login: String,
+  password: String
 });
-
-const User = mongoose.model("users1", userScheme);
+const User1 = mongoose.model("users1", userScheme);
+*/
 
 
 class authController {
+  /*
     async signin(req, res){
         try{
             console.log('work');
             const userLogin = req.body.login;
             const userPassword = req.body.password;
             let user = null;
-            user = await User.find({$and : [{login: userLogin}, {password: userPassword}]});
+            user = await User1.find({$and : [{login: userLogin}, {password: userPassword}]});
             if(isEmpty(user)){
               console.log('ErrorUser1');
                 throw new Error(404);
@@ -56,6 +52,7 @@ class authController {
               res.status(404).send();
           }
     }
+*/
 
     async me(req, res){
 
