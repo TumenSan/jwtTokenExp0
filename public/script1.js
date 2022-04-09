@@ -12,7 +12,7 @@ document.forms["userForm"].addEventListener("submit", e => {
 
 async function signupJwt(userLogin, userPassword) {
     // отправляет запрос и получаем ответ
-    const response = await fetch("/signup", {
+    const response = await fetch("/users/signup", {
         method: "POST",
         headers: { "Accept": "application/json", "Content-Type": "application/json"},
         body: JSON.stringify({
@@ -49,7 +49,7 @@ function signinPre() {
 
 async function signin(userLogin, userPassword) {
     // отправляет запрос и получаем ответ
-    const response = await fetch("/signin", {
+    const response = await fetch("/users/signin", {
         method: "POST",
         headers: { "Accept": "application/json", "Content-Type": "application/json"},
         body: JSON.stringify({
@@ -77,7 +77,7 @@ async function signin(userLogin, userPassword) {
 
 async function MeUsers() {
     // отправляет запрос и получаем ответ
-    const response = await fetch("/me/", {
+    const response = await fetch("/users/me", {
         method: "GET",
         headers: { "Accept": "application/json", 
                     "Authorization": "Bearer" + document.cookie}
@@ -105,7 +105,7 @@ async function MeUsers() {
 // Получение всех пользователей
 async function GetUsers() {
     // отправляет запрос и получаем ответ
-    const response = await fetch("/users", {
+    const response = await fetch("/users/users", {
         method: "GET",
         headers: { "Accept": "application/json" }
     });
@@ -136,7 +136,7 @@ function GetUserPre() {
 // Получение пользователя
 async function GetUser(token) {
     // отправляет запрос и получаем ответ
-    const response = await fetch("/users/" + token, {
+    const response = await fetch("/users/users/" + token, {
         method: "GET",
         headers: { "Accept": "application/json" }
     });
