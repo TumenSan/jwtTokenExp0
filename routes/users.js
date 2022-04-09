@@ -103,6 +103,17 @@ router.post("/signup", signupMiddleware, async function (req, res) {
   }
 });
 
+/**
+ * @openapi
+ * /users/me:
+ *   post:
+ *     description: me
+ *     responses:
+ *       200:
+ *         description: me ok
+ */
+
+
 router.get("/me", function (req, res) {
   const token = req.headers.authorization.split(" ")[1];
   if (!token) {
@@ -120,6 +131,16 @@ router.get("/me", function (req, res) {
     return res.status(404).json({ message: "User not found" });
   }
 });
+
+/**
+ * @openapi
+ * /users/users:
+ *   get:
+ *     description: users
+ *     responses:
+ *       200:
+ *         description: users ok
+ */
 
 router.get("/users", function (req, res) {
   let user = null;
@@ -147,6 +168,16 @@ router.get("/users", function (req, res) {
     }
   });
 });
+
+/**
+ * @openapi
+ * /users/user:
+ *   get:
+ *     description: user
+ *     responses:
+ *       200:
+ *         description: user ok
+ */
 
 router.get("/user", (req, res) => {
   const token = req.headers.authorization.split(" ")[1];
