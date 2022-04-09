@@ -9,6 +9,18 @@ const signupMiddleware = require('./signupMiddleware');
 require("dotenv").config();
 const tokenKey = "1a2b-3c4d-5e6f-7g8h";
 
+
+/**
+ * @openapi
+ * /users/signin:
+ *   post:
+ *     description: signin
+ *     responses:
+ *       200:
+ *         description: signin ok
+ */
+
+
 router.post("/signin", signinMiddleware, async function (req, res) {
   try {
     console.log("work");
@@ -44,6 +56,16 @@ router.post("/signin", signinMiddleware, async function (req, res) {
     res.status(404).send();
   }
 });
+
+/**
+ * @openapi
+ * /users/signup:
+ *   post:
+ *     description: signup
+ *     responses:
+ *       200:
+ *         description: signup ok
+ */
 
 router.post("/signup", signupMiddleware, async function (req, res) {
   try {

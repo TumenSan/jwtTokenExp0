@@ -5,6 +5,23 @@ const express = require("express"),
   jwt = require("jsonwebtoken");
 
 const fs = require("fs");
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'User api',
+      version: '1.0.0',
+    },
+  },
+  apis: ['./routes/users.js'], // files containing annotations as above
+};
+
+const openapiSpecification = swaggerJsdoc(options);
+
+
 require("dotenv").config();
 const mongoose = require("mongoose");
 
@@ -27,7 +44,12 @@ const port = 7000;
 const { body, check, validationResult } = require("express-validator");
 
 const tokenKey = "1a2b-3c4d-5e6f-7g8h";
-app.db = mongoose;
+
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification));
+
+
+
 app.use(express.static(__dirname + "/public")); //
 
 app.use(express.json());
